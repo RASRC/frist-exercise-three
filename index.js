@@ -6,3 +6,6 @@ import{
     PerspectiveCamera,
     WebGLRenderer
 } from "three"
+
+const escena = new Scene()
+
