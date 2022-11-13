@@ -22,3 +22,5 @@ const tamaño = {
 }
 
 const camara = new PerspectiveCamera(75,tamaño.width / tamaño.height)
+
+escena.add(camara)

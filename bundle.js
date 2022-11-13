@@ -10347,4 +10347,6 @@ const tamaño = {
     height: 600
 };
 
-new PerspectiveCamera(75,tamaño.width / tamaño.height);
+const camara = new PerspectiveCamera(75,tamaño.width / tamaño.height);
+
+escena.add(camara);
