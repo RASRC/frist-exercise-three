@@ -28647,3 +28647,12 @@ const renderer = new WebGLRenderer({
     canvas: canvasHtml});
 renderer.setSize(tamaño.width,tamaño.height);
 renderer.render(cubo,camara);
+
+function animate() {
+    cubo.rotation.x += 0.01;
+    cubo.rotation.z += 0.01;
+    renderer.render(escena, camara);
+    requestAnimationFrame(animate);
+ }
+ 
+ animate();
