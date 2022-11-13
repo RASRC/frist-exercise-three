@@ -22,5 +22,12 @@ const tamaño = {
 }
 
 const camara = new PerspectiveCamera(75,tamaño.width / tamaño.height)
+camara.position.z = 3
 
 escena.add(camara)
+
+const canvasHtml = document.getElementById("escena-inicial")
+const renderer = new WebGLRenderer({
+    canvas: canvasHtml})
+renderer.setSize(tamaño.width,tamaño.height)
+renderer.render(cubo,camara)
