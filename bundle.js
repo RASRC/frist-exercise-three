@@ -28628,15 +28628,9 @@ const escena = new Scene();
 const geometria = new BoxGeometry(0.5,0.5,0.5);
 const material = new MeshBasicMaterial({color: "blue"});
 
-const materialVerde = new MeshBasicMaterial({color: "green"});
-
 const cubo = new Mesh(geometria,material);
 
-const cuboverde = new Mesh(geometria,materialVerde);
-cuboverde.position.x = 2
-
 escena.add(cubo);
-escena.add(cuboverde);
 
 const tamaño = {
     width: 800,
@@ -28644,7 +28638,7 @@ const tamaño = {
 };
 
 const camara = new PerspectiveCamera(75,tamaño.width / tamaño.height);
-camara.position.z = 3;
+camara.position.y = 3;
 
 escena.add(camara);
 
@@ -28657,8 +28651,6 @@ renderer.render(cubo,camara);
 function animate() {
     cubo.rotation.x += 0.01;
     cubo.rotation.z += 0.01;
-	cuboverde.rotation.x += 0.05;
-    cuboverde.rotation.z += 0.05;
     renderer.render(escena, camara);
     requestAnimationFrame(animate);
  }
