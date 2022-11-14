@@ -28623,6 +28623,7 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
+const canvasHtml = document.getElementById("escena-inicial");
 const escena = new Scene();
 
 const geometria = new BoxGeometry(1.5,1.5,1.5);
@@ -28632,21 +28633,22 @@ const cubo = new Mesh(geometria,material);
 
 escena.add(cubo);
 
-const tamaño = {
+/*const tamaño = {
     width: 800,
     height: 600
-};
+}*/
 
-const camara = new PerspectiveCamera(75,tamaño.width / tamaño.height);
+const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientWidth);
 camara.position.z = 3;
 
 escena.add(camara);
 
-const canvasHtml = document.getElementById("escena-inicial");
+
 const renderer = new WebGLRenderer({
     canvas: canvasHtml});
-renderer.setSize(tamaño.width,tamaño.height);
+renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false);
 renderer.render(cubo,camara);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 function animate() {
     cubo.rotation.x += 0.01;
@@ -28656,3 +28658,9 @@ function animate() {
  }
  
  animate();
+
+ camara.addEventListener("resize",()=>{
+    camara.aspect = canvasHtml.clientWidth / canvasHtml.clientHeight;
+    camara.updateProjectionMatrix();
+    renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false);
+ });
