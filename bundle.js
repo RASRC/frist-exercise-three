@@ -28625,7 +28625,7 @@ if ( typeof window !== 'undefined' ) {
 
 const escena = new Scene();
 
-const geometria = new BoxGeometry(0.5,0.5,0.5);
+const geometria = new BoxGeometry(1.5,1.5,1.5);
 const material = new MeshBasicMaterial({color: "blue"});
 
 const cubo = new Mesh(geometria,material);
@@ -28638,7 +28638,7 @@ const tamaño = {
 };
 
 const camara = new PerspectiveCamera(75,tamaño.width / tamaño.height);
-camara.position.y = 3;
+camara.position.z = 3;
 
 escena.add(camara);
 
