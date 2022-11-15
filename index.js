@@ -4,10 +4,41 @@ import{
     MeshBasicMaterial,
     Mesh,
     PerspectiveCamera,
-    WebGLRenderer
+    WebGLRenderer,
+    MOUSE,
+    Vector2,
+    Vector3,
+    Vector4,
+    Quaternion,
+    Matrix4,
+    Spherical,
+    Box3,
+    Sphere,
+    Raycaster,
+    MathUtils,
+    Clock
 } from "three"
 
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import CameraControls from "camera-controls";
+
+//import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+const subsetOfTHREE = {
+    MOUSE,
+    Vector2,
+    Vector3,
+    Vector4,
+    Quaternion,
+    Matrix4,
+    Spherical,
+    Box3,
+    Sphere,
+    Raycaster,
+    MathUtils: {
+      DEG2RAD: MathUtils.DEG2RAD,
+      clamp: MathUtils.clamp
+    }
+  };
 
 const canvasHtml = document.getElementById("escena-inicial")
 const escena = new Scene()
@@ -24,11 +55,16 @@ escena.add(cubo)
     height: 600
 }*/
 
+
 const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientWidth)
 camara.position.z = 3
 
-const controls = new OrbitControls(camara, canvasHtml);
-controls.enableDamping = true;
+CameraControls.install( { THREE: subsetOfTHREE } );
+const clock = new Clock();
+const controls = new CameraControls(camara, canvasHtml);
+
+/*const controls = new OrbitControls(camara, canvasHtml);
+controls.enableDamping = true;*/
 
 escena.add(camara)
 
@@ -42,7 +78,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 function animate() {
     /*cubo.rotation.x += 0.01;
     cubo.rotation.z += 0.01;*/
-    controls.update();
+    const delta = clock.getDelta();
+    controls.update(delta);
     renderer.render(escena, camara);
     requestAnimationFrame(animate);
  }
