@@ -7,6 +7,8 @@ import{
     WebGLRenderer
 } from "three"
 
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
 const canvasHtml = document.getElementById("escena-inicial")
 const escena = new Scene()
 
@@ -25,6 +27,9 @@ escena.add(cubo)
 const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientWidth)
 camara.position.z = 3
 
+const controls = new OrbitControls(camara, canvasHtml);
+controls.enableDamping = true;
+
 escena.add(camara)
 
 
@@ -35,8 +40,9 @@ renderer.render(cubo,camara)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 function animate() {
-    cubo.rotation.x += 0.01;
-    cubo.rotation.z += 0.01;
+    /*cubo.rotation.x += 0.01;
+    cubo.rotation.z += 0.01;*/
+    controls.update();
     renderer.render(escena, camara);
     requestAnimationFrame(animate);
  }
