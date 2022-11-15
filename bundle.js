@@ -31222,6 +31222,7 @@ camara.position.z = 3;
 CameraControls.install( { THREE: subsetOfTHREE } );
 const clock = new Clock();
 const controls = new CameraControls(camara, canvasHtml);
+controls.dollyToCursor=true;
 
 /*const controls = new OrbitControls(camara, canvasHtml);
 controls.enableDamping = true;*/
