@@ -2,6 +2,7 @@ import{
     Scene,
     BoxGeometry,
     MeshBasicMaterial,
+    MeshPhongMaterial,
     Mesh,
     PerspectiveCamera,
     WebGLRenderer,
@@ -16,7 +17,8 @@ import{
     Sphere,
     Raycaster,
     MathUtils,
-    Clock
+    Clock,
+    DirectionalLight
 } from "three"
 
 import CameraControls from "camera-controls";
@@ -44,7 +46,9 @@ const canvasHtml = document.getElementById("escena-inicial")
 const escena = new Scene()
 
 const geometria = new BoxGeometry(1.5,1.5,1.5)
-const material = new MeshBasicMaterial({color: "blue"})
+const material = new MeshPhongMaterial({
+  color: "blue",
+  specular: "white"})
 
 const cubo = new Mesh(geometria,material)
 
@@ -55,6 +59,16 @@ escena.add(cubo)
     height: 600
 }*/
 
+const ligth01 = new DirectionalLight()
+ligth01.position.set(0,1,1)
+escena.add(ligth01)
+
+const ligth02 = new DirectionalLight()
+ligth01.position.set(1,1,1)
+escena.add(ligth02)
+
+material.shininess = "100"
+material.flatShading="true"
 
 const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientWidth)
 camara.position.z = 3
