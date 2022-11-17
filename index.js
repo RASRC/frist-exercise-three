@@ -19,7 +19,9 @@ import{
     MathUtils,
     Clock,
     DirectionalLight,
-    AmbientLight
+    AmbientLight,
+    SphereGeometry,
+    AxesHelper
 } from "three"
 
 import CameraControls from "camera-controls";
@@ -46,14 +48,27 @@ const subsetOfTHREE = {
 const canvasHtml = document.getElementById("escena-inicial")
 const escena = new Scene()
 
-const geometria = new BoxGeometry(1.5,1.5,1.5)
-const material = new MeshPhongMaterial({
-  color: "blue",
-  specular: "white"})
+const axesHelper = new AxesHelper();
+escena.add(axesHelper);
 
-const cubo = new Mesh(geometria,material)
+//const geometria = new BoxGeometry(1.5,1.5,1.5)
+const geometria = new SphereGeometry(0.5)
+const material = new MeshPhongMaterial({color: "yellow"})
+const materialBlue = new MeshPhongMaterial({color: "blue"})
+const materialWhite = new MeshPhongMaterial({color: "white"})
 
-escena.add(cubo)
+const sol = new Mesh(geometria,material)
+const tierra = new Mesh(geometria,materialBlue)
+tierra.scale.set(0.2,0.2,0.2)
+tierra.position.x=2
+const luna = new Mesh(geometria,materialWhite)
+luna.position.x=1
+luna.scale.set(0.3,0.3,0.3)
+
+
+escena.add(sol)
+sol.add(tierra)
+tierra.add(luna)
 
 /*const tamaño = {
     width: 800,
@@ -74,7 +89,7 @@ escena.add(ligth02)*/
 material.shininess = "100"
 material.flatShading="true"
 
-const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientWidth)
+const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientHeight)
 camara.position.z = 3
 
 CameraControls.install( { THREE: subsetOfTHREE } );
@@ -91,12 +106,14 @@ escena.add(camara)
 const renderer = new WebGLRenderer({
     canvas: canvasHtml})
 renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false)
-renderer.render(cubo,camara)
+renderer.render(sol,camara)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 function animate() {
     /*cubo.rotation.x += 0.01;
     cubo.rotation.z += 0.01;*/
+    sol.rotation.y += 0.01
+    tierra.rotation.y += 0.03
     const delta = clock.getDelta();
     controls.update(delta);
     renderer.render(escena, camara);
