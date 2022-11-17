@@ -29161,6 +29161,20 @@ class DirectionalLight extends Light {
 
 }
 
+class AmbientLight extends Light {
+
+	constructor( color, intensity ) {
+
+		super( color, intensity );
+
+		this.isAmbientLight = true;
+
+		this.type = 'AmbientLight';
+
+	}
+
+}
+
 class Clock {
 
 	constructor( autoStart = true ) {
@@ -31579,9 +31593,12 @@ const ligth01 = new DirectionalLight();
 ligth01.position.set(0,1,1);
 escena.add(ligth01);
 
-const ligth02 = new DirectionalLight();
-ligth01.position.set(1,1,1);
-escena.add(ligth02);
+const light03 = new AmbientLight("0xffffff",0.5);
+escena.add(light03);
+
+/*const ligth02 = new DirectionalLight()
+ligth01.position.set(1,1,1)
+escena.add(ligth02)*/
 
 material.shininess = "100";
 material.flatShading="true";
