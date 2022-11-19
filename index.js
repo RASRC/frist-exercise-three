@@ -21,7 +21,8 @@ import{
     DirectionalLight,
     AmbientLight,
     SphereGeometry,
-    AxesHelper
+    AxesHelper,
+    GridHelper
 } from "three"
 
 import CameraControls from "camera-controls";
@@ -48,14 +49,11 @@ const subsetOfTHREE = {
 const canvasHtml = document.getElementById("escena-inicial")
 const escena = new Scene()
 
-const axesHelper = new AxesHelper();
-escena.add(axesHelper);
-
 //const geometria = new BoxGeometry(1.5,1.5,1.5)
 const geometria = new SphereGeometry(0.5)
 const material = new MeshPhongMaterial({color: "yellow"})
 const materialBlue = new MeshPhongMaterial({color: "blue"})
-const materialWhite = new MeshPhongMaterial({color: "white"})
+const materialWhite = new MeshPhongMaterial({color: "grey"})
 
 const sol = new Mesh(geometria,material)
 const tierra = new Mesh(geometria,materialBlue)
@@ -65,10 +63,22 @@ const luna = new Mesh(geometria,materialWhite)
 luna.position.x=1
 luna.scale.set(0.3,0.3,0.3)
 
+const axesHelper = new AxesHelper()
+axesHelper.material.depthTest=false
+axesHelper.renderOrder=2
 
+const axesTierra = new AxesHelper(0.5)
+axesTierra.material.depthTest=false
+axesTierra.renderOrder=2
+
+const grid = new GridHelper()
+
+escena.add(axesHelper)
 escena.add(sol)
+escena.add(grid)
 sol.add(tierra)
 tierra.add(luna)
+tierra.add(axesTierra)
 
 /*const tamaño = {
     width: 800,
@@ -91,6 +101,10 @@ material.flatShading="true"
 
 const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientHeight)
 camara.position.z = 3
+camara.position.x = 3
+camara.position.y = 3
+camara.lookAt(axesHelper.position)
+
 
 CameraControls.install( { THREE: subsetOfTHREE } );
 const clock = new Clock();
@@ -108,6 +122,7 @@ const renderer = new WebGLRenderer({
 renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false)
 renderer.render(sol,camara)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor("white",1)
 
 function animate() {
     /*cubo.rotation.x += 0.01;

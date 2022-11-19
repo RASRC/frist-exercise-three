@@ -29862,6 +29862,54 @@ class Spherical {
 
 }
 
+class GridHelper extends LineSegments {
+
+	constructor( size = 10, divisions = 10, color1 = 0x444444, color2 = 0x888888 ) {
+
+		color1 = new Color( color1 );
+		color2 = new Color( color2 );
+
+		const center = divisions / 2;
+		const step = size / divisions;
+		const halfSize = size / 2;
+
+		const vertices = [], colors = [];
+
+		for ( let i = 0, j = 0, k = - halfSize; i <= divisions; i ++, k += step ) {
+
+			vertices.push( - halfSize, 0, k, halfSize, 0, k );
+			vertices.push( k, 0, - halfSize, k, 0, halfSize );
+
+			const color = i === center ? color1 : color2;
+
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+
+		}
+
+		const geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+		const material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
+
+		super( geometry, material );
+
+		this.type = 'GridHelper';
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
+}
+
 class AxesHelper extends LineSegments {
 
 	constructor( size = 1 ) {
@@ -32060,14 +32108,11 @@ const subsetOfTHREE = {
 const canvasHtml = document.getElementById("escena-inicial");
 const escena = new Scene();
 
-const axesHelper = new AxesHelper();
-escena.add(axesHelper);
-
 //const geometria = new BoxGeometry(1.5,1.5,1.5)
 const geometria = new SphereGeometry(0.5);
 const material = new MeshPhongMaterial({color: "yellow"});
 const materialBlue = new MeshPhongMaterial({color: "blue"});
-const materialWhite = new MeshPhongMaterial({color: "white"});
+const materialWhite = new MeshPhongMaterial({color: "grey"});
 
 const sol = new Mesh(geometria,material);
 const tierra = new Mesh(geometria,materialBlue);
@@ -32077,10 +32122,22 @@ const luna = new Mesh(geometria,materialWhite);
 luna.position.x=1;
 luna.scale.set(0.3,0.3,0.3);
 
+const axesHelper = new AxesHelper();
+axesHelper.material.depthTest=false;
+axesHelper.renderOrder=2;
 
+const axesTierra = new AxesHelper(0.5);
+axesTierra.material.depthTest=false;
+axesTierra.renderOrder=2;
+
+const grid = new GridHelper();
+
+escena.add(axesHelper);
 escena.add(sol);
+escena.add(grid);
 sol.add(tierra);
 tierra.add(luna);
+tierra.add(axesTierra);
 
 /*const tamaño = {
     width: 800,
@@ -32103,6 +32160,10 @@ material.flatShading="true";
 
 const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientHeight);
 camara.position.z = 3;
+camara.position.x = 3;
+camara.position.y = 3;
+camara.lookAt(axesHelper.position);
+
 
 CameraControls.install( { THREE: subsetOfTHREE } );
 const clock = new Clock();
@@ -32120,6 +32181,7 @@ const renderer = new WebGLRenderer({
 renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false);
 renderer.render(sol,camara);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor("white",1);
 
 function animate() {
     /*cubo.rotation.x += 0.01;
