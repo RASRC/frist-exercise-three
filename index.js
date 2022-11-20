@@ -1,3 +1,5 @@
+//Importación de constructores
+
 import{
     Scene,
     BoxGeometry,
@@ -46,14 +48,27 @@ const subsetOfTHREE = {
     }
   };
 
+//Canvas HTML
+
 const canvasHtml = document.getElementById("escena-inicial")
+
+//Escena
+
 const escena = new Scene()
+
+//Geometría y materiales
 
 //const geometria = new BoxGeometry(1.5,1.5,1.5)
 const geometria = new SphereGeometry(0.5)
 const material = new MeshPhongMaterial({color: "yellow"})
+
+
 const materialBlue = new MeshPhongMaterial({color: "blue"})
 const materialWhite = new MeshPhongMaterial({color: "grey"})
+material.shininess = "100"
+material.flatShading="true"
+
+//Objetos
 
 const sol = new Mesh(geometria,material)
 const tierra = new Mesh(geometria,materialBlue)
@@ -63,10 +78,15 @@ const luna = new Mesh(geometria,materialWhite)
 luna.position.x=1
 luna.scale.set(0.3,0.3,0.3)
 
+escena.add(sol)
+sol.add(tierra)
+tierra.add(luna)
+
+//Coordenadas y grillas
+
 const axesHelper = new AxesHelper()
 axesHelper.material.depthTest=false
 axesHelper.renderOrder=2
-
 const axesTierra = new AxesHelper(0.5)
 axesTierra.material.depthTest=false
 axesTierra.renderOrder=2
@@ -74,16 +94,10 @@ axesTierra.renderOrder=2
 const grid = new GridHelper()
 
 escena.add(axesHelper)
-escena.add(sol)
-escena.add(grid)
-sol.add(tierra)
-tierra.add(luna)
 tierra.add(axesTierra)
+escena.add(grid)
 
-/*const tamaño = {
-    width: 800,
-    height: 600
-}*/
+//Luces
 
 const ligth01 = new DirectionalLight()
 ligth01.position.set(0,1,1)
@@ -96,15 +110,13 @@ escena.add(light03)
 ligth01.position.set(1,1,1)
 escena.add(ligth02)*/
 
-material.shininess = "100"
-material.flatShading="true"
+//Cámara
 
 const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientHeight)
 camara.position.z = 3
 camara.position.x = 3
 camara.position.y = 3
 camara.lookAt(axesHelper.position)
-
 
 CameraControls.install( { THREE: subsetOfTHREE } );
 const clock = new Clock();
@@ -116,6 +128,7 @@ controls.enableDamping = true;*/
 
 escena.add(camara)
 
+//Renderizador
 
 const renderer = new WebGLRenderer({
     canvas: canvasHtml})
@@ -123,6 +136,8 @@ renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false)
 renderer.render(sol,camara)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor("white",1)
+
+//Animación de objetos
 
 function animate() {
     /*cubo.rotation.x += 0.01;
@@ -136,6 +151,8 @@ function animate() {
  }
  
  animate();
+
+ //Responsividad
 
  camara.addEventListener("resize",()=>{
     camara.aspect = canvasHtml.clientWidth / canvasHtml.clientHeight
