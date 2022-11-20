@@ -48,6 +48,10 @@ const subsetOfTHREE = {
     }
   };
 
+import GUI from "three/examples/jsm/libs/lil-gui.module.min.js";
+
+import gsap from "gsap";
+
 //Canvas HTML
 
 const canvasHtml = document.getElementById("escena-inicial")
@@ -159,3 +163,32 @@ function animate() {
     camara.updateProjectionMatrix()
     renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false)
  })
+
+ //Debugging
+
+const gui = new GUI()
+
+const posicionFolder = gui.addFolder("Posición")
+posicionFolder.add(sol.position,"x",-3,3,0.01)
+posicionFolder.add(sol.position,"y",-3,3,0.01)
+posicionFolder.add(sol.position,"z",-3,3,0.01)
+
+const vistaFolder = gui.addFolder("Apariencia")
+vistaFolder.add(sol,"visible").name("visibilidad")
+
+const colorParam = {
+  value: "0xFFFF00"
+}
+vistaFolder.addColor(colorParam,"value").onChange(() => {
+  sol.material.color.set(colorParam.value)
+}).name("color")
+
+const functionParam = {
+  spin: () => {
+    gsap.to(sol.rotation,{
+      z: sol.rotation.z + 10,
+      duration: 1
+    })
+  }
+}
+vistaFolder.add(functionParam,"spin").name("voltereta")
