@@ -24,7 +24,10 @@ import{
     AmbientLight,
     SphereGeometry,
     AxesHelper,
-    GridHelper
+    GridHelper,
+    EdgesGeometry,
+    LineBasicMaterial,
+    LineSegments
 } from "three"
 
 import CameraControls from "camera-controls";
@@ -65,7 +68,6 @@ const escena = new Scene()
 //const geometria = new BoxGeometry(1.5,1.5,1.5)
 const geometria = new SphereGeometry(0.5)
 const material = new MeshPhongMaterial({color: "yellow"})
-
 
 const materialBlue = new MeshPhongMaterial({color: "blue"})
 const materialWhite = new MeshPhongMaterial({color: "grey"})
@@ -192,3 +194,25 @@ const functionParam = {
   }
 }
 vistaFolder.add(functionParam,"spin").name("voltereta")
+
+//Wireframe
+
+const stationGeometry = new BoxGeometry(0.5,0.5,0.5)
+const spaceMaterial = new MeshBasicMaterial({
+  color: "white",
+  polygonOffset: true,
+  polygonOffsetFactor: 1, 
+  polygonOffsetUnits: 1
+})
+
+const spaceStation = new Mesh(stationGeometry,spaceMaterial)
+spaceStation.position.x=2
+spaceStation.position.z=2
+
+escena.add(spaceStation)
+
+const edgesGeo = new EdgesGeometry(stationGeometry)
+const edgesMaterial = new LineBasicMaterial({color: "black"})
+const wireframe = new LineSegments(edgesGeo,edgesMaterial)
+spaceStation.add(wireframe)
+
