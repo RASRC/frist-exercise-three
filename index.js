@@ -55,6 +55,8 @@ import GUI from "three/examples/jsm/libs/lil-gui.module.min.js";
 
 import gsap from "gsap";
 
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 //Canvas HTML
 
 const canvasHtml = document.getElementById("escena-inicial")
@@ -215,4 +217,19 @@ const edgesGeo = new EdgesGeometry(stationGeometry)
 const edgesMaterial = new LineBasicMaterial({color: "black"})
 const wireframe = new LineSegments(edgesGeo,edgesMaterial)
 spaceStation.add(wireframe)
+
+//Loaders
+
+const loader = new GLTFLoader()
+loader.load("./police_station.glb",
+(archivo) =>{
+  escena.add(archivo.scene)
+},
+(progress)=>{
+  console.log(progress)
+},
+(error)=>{
+  console.log(error)
+}
+)
 
