@@ -233,9 +233,8 @@ const progreso = document.getElementById("barra-progreso")
 const loader = new GLTFLoader()
 loader.load("./police_station.glb",
 (archivo) =>{
-  escena.add(archivo.scene)
-  //loadingScreen.style.display = "none"
   loadingScreen.classList.add("hidden")
+  escena.add(archivo.scene)
 },
 (progress)=>{
   const avanceBruto = progress.loaded / progress.total * 100
