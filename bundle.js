@@ -41697,13 +41697,21 @@ spaceStation.add(wireframe)
 */
 //Loaders
 
+const loadingScreen = document.getElementById("escena-inicial");
+const progreso = document.getElementById("barra-progreso");
+
 const loader = new GLTFLoader();
 loader.load("./police_station.glb",
 (archivo) =>{
   escena.add(archivo.scene);
+  //loadingScreen.style.display = "none"
+  loadingScreen.classList.add("hidden");
 },
 (progress)=>{
-  console.log(progress);
+  const avanceBruto = progress.loaded / progress.total * 100;
+  const avanceRedondeo = Math.round(avanceBruto);
+  progreso.textContent = `CARGANDO ${avanceRedondeo}%`;
+  //console.log(progress)
 },
 (error)=>{
   console.log(error);
