@@ -65,6 +65,7 @@ const canvasHtml = document.getElementById("escena-inicial")
 
 const escena = new Scene()
 
+/*
 //Geometría y materiales
 
 //const geometria = new BoxGeometry(1.5,1.5,1.5)
@@ -89,20 +90,22 @@ luna.scale.set(0.3,0.3,0.3)
 escena.add(sol)
 sol.add(tierra)
 tierra.add(luna)
+*/
 
 //Coordenadas y grillas
 
 const axesHelper = new AxesHelper()
 axesHelper.material.depthTest=false
 axesHelper.renderOrder=2
+/*
 const axesTierra = new AxesHelper(0.5)
 axesTierra.material.depthTest=false
 axesTierra.renderOrder=2
+tierra.add(axesTierra)
+*/
 
 const grid = new GridHelper()
-
 escena.add(axesHelper)
-tierra.add(axesTierra)
 escena.add(grid)
 
 //Luces
@@ -124,12 +127,13 @@ const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clie
 camara.position.z = 3
 camara.position.x = 3
 camara.position.y = 3
-camara.lookAt(axesHelper.position)
+//camara.lookAt(axesHelper.position)
 
 CameraControls.install( { THREE: subsetOfTHREE } );
 const clock = new Clock();
 const controls = new CameraControls(camara, canvasHtml);
 controls.dollyToCursor=true;
+controls.setLookAt(15, 15, 15, 0, 10, 0)
 
 /*const controls = new OrbitControls(camara, canvasHtml);
 controls.enableDamping = true;*/
@@ -141,7 +145,6 @@ escena.add(camara)
 const renderer = new WebGLRenderer({
     canvas: canvasHtml})
 renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false)
-renderer.render(sol,camara)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor("white",1)
 
@@ -150,8 +153,10 @@ renderer.setClearColor("white",1)
 function animate() {
     /*cubo.rotation.x += 0.01;
     cubo.rotation.z += 0.01;*/
+    /*
     sol.rotation.y += 0.01
     tierra.rotation.y += 0.03
+    */
     const delta = clock.getDelta();
     controls.update(delta);
     renderer.render(escena, camara);
@@ -168,6 +173,7 @@ function animate() {
     renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false)
  })
 
+ /*
  //Debugging
 
 const gui = new GUI()
@@ -218,6 +224,7 @@ const edgesMaterial = new LineBasicMaterial({color: "black"})
 const wireframe = new LineSegments(edgesGeo,edgesMaterial)
 spaceStation.add(wireframe)
 
+*/
 //Loaders
 
 const loader = new GLTFLoader()
