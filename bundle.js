@@ -41697,7 +41697,7 @@ spaceStation.add(wireframe)
 */
 //Loaders
 
-const loadingScreen = document.getElementById("escena-inicial");
+const loadingScreen = document.getElementById("pantalla-carga");
 const progreso = document.getElementById("barra-progreso");
 
 const loader = new GLTFLoader();
