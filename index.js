@@ -1,69 +1,132 @@
 //Importación de constructores
 
-import{
-    Scene,
-    BoxGeometry,
-    MeshBasicMaterial,
-    MeshPhongMaterial,
-    Mesh,
-    PerspectiveCamera,
-    WebGLRenderer,
-    MOUSE,
-    Vector2,
-    Vector3,
-    Vector4,
-    Quaternion,
-    Matrix4,
-    Spherical,
-    Box3,
-    Sphere,
-    Raycaster,
-    MathUtils,
-    Clock,
-    DirectionalLight,
-    AmbientLight,
-    SphereGeometry,
-    AxesHelper,
-    GridHelper,
-    EdgesGeometry,
-    LineBasicMaterial,
-    LineSegments
-} from "three"
+import {
+  Scene,
+  BoxGeometry,
+  MeshBasicMaterial,
+  MeshPhongMaterial,
+  Mesh,
+  PerspectiveCamera,
+  WebGLRenderer,
+  MOUSE,
+  Vector2,
+  Vector3,
+  Vector4,
+  Quaternion,
+  Matrix4,
+  Spherical,
+  Box3,
+  Sphere,
+  Raycaster,
+  MathUtils,
+  Clock,
+  DirectionalLight,
+  AmbientLight,
+  SphereGeometry,
+  AxesHelper,
+  GridHelper,
+  EdgesGeometry,
+  LineBasicMaterial,
+  LineSegments,
+} from "three";
 
 import CameraControls from "camera-controls";
 
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 const subsetOfTHREE = {
-    MOUSE,
-    Vector2,
-    Vector3,
-    Vector4,
-    Quaternion,
-    Matrix4,
-    Spherical,
-    Box3,
-    Sphere,
-    Raycaster,
-    MathUtils: {
-      DEG2RAD: MathUtils.DEG2RAD,
-      clamp: MathUtils.clamp
-    }
-  };
+  MOUSE,
+  Vector2,
+  Vector3,
+  Vector4,
+  Quaternion,
+  Matrix4,
+  Spherical,
+  Box3,
+  Sphere,
+  Raycaster,
+  MathUtils: {
+    DEG2RAD: MathUtils.DEG2RAD,
+    clamp: MathUtils.clamp,
+  },
+};
 
 import GUI from "three/examples/jsm/libs/lil-gui.module.min.js";
 
 import gsap from "gsap";
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 //Canvas HTML
 
-const canvasHtml = document.getElementById("escena-inicial")
+const canvasHtml = document.getElementById("escena-inicial");
 
 //Escena
 
-const escena = new Scene()
+const escena = new Scene();
+
+//Cámara
+
+const camara = new PerspectiveCamera(
+  75,
+  canvasHtml.clientWidth / canvasHtml.clientHeight
+);
+camara.position.z = 3;
+camara.position.x = 3;
+camara.position.y = 3;
+//camara.lookAt(axesHelper.position)
+
+// Raycasting
+
+const geoCubo = new BoxGeometry(1, 1, 1);
+const materialCubo = new MeshBasicMaterial({
+  color: "orange",
+});
+const resaltador = new MeshBasicMaterial({
+  color: "red",
+});
+const cubo = new Mesh(geoCubo, materialCubo);
+escena.add(cubo);
+const seleccionPrevia = {
+  objeto: null,
+  material: null,
+};
+const raycaster = new Raycaster();
+const mouse = new Vector2();
+
+canvasHtml.addEventListener("mousemove", (event) => {
+  mouse.x = (event.clientX / canvasHtml.clientWidth) * 2 - 1;
+  mouse.y = -(event.clientY / canvasHtml.clientHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camara);
+  const inters = raycaster.intersectObject(cubo);
+
+  const colisiona = inters.length !== 0;
+  if (!colisiona) {
+    reinicioObjeto()
+    return;
+  }
+
+  const primerElemento = inters[0]
+  const enObjeto = seleccionPrevia.objeto === primerElemento.object
+
+  if(enObjeto) return
+  
+  reinicioObjeto()
+
+  seleccionPrevia.objeto = primerElemento.object
+  seleccionPrevia.material = primerElemento.object.material
+
+  primerElemento.object.material = resaltador
+
+})
+
+function reinicioObjeto(){
+  if (seleccionPrevia.objeto) {
+    seleccionPrevia.objeto.material = seleccionPrevia.material;
+    seleccionPrevia.objeto = null;
+    seleccionPrevia.material = null;
+  }
+}
 
 /*
 //Geometría y materiales
@@ -94,9 +157,9 @@ tierra.add(luna)
 
 //Coordenadas y grillas
 
-const axesHelper = new AxesHelper()
-axesHelper.material.depthTest=false
-axesHelper.renderOrder=2
+const axesHelper = new AxesHelper();
+axesHelper.material.depthTest = false;
+axesHelper.renderOrder = 2;
 /*
 const axesTierra = new AxesHelper(0.5)
 axesTierra.material.depthTest=false
@@ -104,76 +167,69 @@ axesTierra.renderOrder=2
 tierra.add(axesTierra)
 */
 
-const grid = new GridHelper()
-escena.add(axesHelper)
-escena.add(grid)
+const grid = new GridHelper();
+escena.add(axesHelper);
+escena.add(grid);
 
 //Luces
 
-const ligth01 = new DirectionalLight()
-ligth01.position.set(0,1,1)
-escena.add(ligth01)
-
-const light03 = new AmbientLight("0xffffff",0.5)
-escena.add(light03)
+const ligth01 = new DirectionalLight();
+ligth01.position.set(0, 1, 1);
+const light03 = new AmbientLight("0xffffff", 0.5);
+escena.add(ligth01, light03);
 
 /*const ligth02 = new DirectionalLight()
 ligth01.position.set(1,1,1)
 escena.add(ligth02)*/
 
-//Cámara
+//Camara Controls
 
-const camara = new PerspectiveCamera(75,canvasHtml.clientWidth / canvasHtml.clientHeight)
-camara.position.z = 3
-camara.position.x = 3
-camara.position.y = 3
-//camara.lookAt(axesHelper.position)
-
-CameraControls.install( { THREE: subsetOfTHREE } );
+CameraControls.install({ THREE: subsetOfTHREE });
 const clock = new Clock();
 const controls = new CameraControls(camara, canvasHtml);
-controls.dollyToCursor=true;
-controls.setLookAt(15, 15, 15, 0, 10, 0)
+controls.dollyToCursor = true;
+controls.setLookAt(3, 4, 2, 0, 0, 0);
 
 /*const controls = new OrbitControls(camara, canvasHtml);
 controls.enableDamping = true;*/
 
-escena.add(camara)
+escena.add(camara);
 
 //Renderizador
 
 const renderer = new WebGLRenderer({
-    canvas: canvasHtml})
-renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false)
+  canvas: canvasHtml,
+});
+renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight, false);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setClearColor("white",1)
+renderer.setClearColor("white", 1);
 
 //Animación de objetos
 
 function animate() {
-    /*cubo.rotation.x += 0.01;
+  /*cubo.rotation.x += 0.01;
     cubo.rotation.z += 0.01;*/
-    /*
+  /*
     sol.rotation.y += 0.01
     tierra.rotation.y += 0.03
     */
-    const delta = clock.getDelta();
-    controls.update(delta);
-    renderer.render(escena, camara);
-    requestAnimationFrame(animate);
- }
- 
- animate();
+  const delta = clock.getDelta();
+  controls.update(delta);
+  renderer.render(escena, camara);
+  requestAnimationFrame(animate);
+}
 
- //Responsividad
+animate();
 
- camara.addEventListener("resize",()=>{
-    camara.aspect = canvasHtml.clientWidth / canvasHtml.clientHeight
-    camara.updateProjectionMatrix()
-    renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight,false)
- })
+//Responsividad
 
- /*
+camara.addEventListener("resize", () => {
+  camara.aspect = canvasHtml.clientWidth / canvasHtml.clientHeight;
+  camara.updateProjectionMatrix();
+  renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight, false);
+});
+
+/*
  //Debugging
 
 const gui = new GUI()
@@ -225,6 +281,7 @@ const wireframe = new LineSegments(edgesGeo,edgesMaterial)
 spaceStation.add(wireframe)
 
 */
+/*
 //Loaders
 
 const loadingScreen = document.getElementById("pantalla-carga")
@@ -247,3 +304,16 @@ loader.load("./police_station.glb",
 }
 )
 
+    <div id="pantalla-carga">
+      <div class="loader">
+        <div class="loader-square"></div>
+        <div class="loader-square"></div>
+        <div class="loader-square"></div>
+        <div class="loader-square"></div>
+        <div class="loader-square"></div>
+        <div class="loader-square"></div>
+        <div class="loader-square"></div>
+      </div>
+      <p id="barra-progreso"></p>
+    </div>
+*/
