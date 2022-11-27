@@ -31850,9 +31850,210 @@ function createBoundingSphere(object3d, out) {
     return boundingSphere;
 }
 
-//Importación de constructores
+class CSS2DObject extends Object3D {
 
-//import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+	constructor( element = document.createElement( 'div' ) ) {
+
+		super();
+
+		this.isCSS2DObject = true;
+
+		this.element = element;
+
+		this.element.style.position = 'absolute';
+		this.element.style.userSelect = 'none';
+
+		this.element.setAttribute( 'draggable', false );
+
+		this.addEventListener( 'removed', function () {
+
+			this.traverse( function ( object ) {
+
+				if ( object.element instanceof Element && object.element.parentNode !== null ) {
+
+					object.element.parentNode.removeChild( object.element );
+
+				}
+
+			} );
+
+		} );
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+}
+
+//
+
+const _vector = new Vector3();
+const _viewMatrix = new Matrix4();
+const _viewProjectionMatrix = new Matrix4();
+const _a = new Vector3();
+const _b = new Vector3();
+
+class CSS2DRenderer {
+
+	constructor( parameters = {} ) {
+
+		const _this = this;
+
+		let _width, _height;
+		let _widthHalf, _heightHalf;
+
+		const cache = {
+			objects: new WeakMap()
+		};
+
+		const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
+
+		domElement.style.overflow = 'hidden';
+
+		this.domElement = domElement;
+
+		this.getSize = function () {
+
+			return {
+				width: _width,
+				height: _height
+			};
+
+		};
+
+		this.render = function ( scene, camera ) {
+
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+
+			_viewMatrix.copy( camera.matrixWorldInverse );
+			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
+
+			renderObject( scene, scene, camera );
+			zOrder( scene );
+
+		};
+
+		this.setSize = function ( width, height ) {
+
+			_width = width;
+			_height = height;
+
+			_widthHalf = _width / 2;
+			_heightHalf = _height / 2;
+
+			domElement.style.width = width + 'px';
+			domElement.style.height = height + 'px';
+
+		};
+
+		function renderObject( object, scene, camera ) {
+
+			if ( object.isCSS2DObject ) {
+
+				_vector.setFromMatrixPosition( object.matrixWorld );
+				_vector.applyMatrix4( _viewProjectionMatrix );
+
+				const visible = ( object.visible === true ) && ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
+				object.element.style.display = ( visible === true ) ? '' : 'none';
+
+				if ( visible === true ) {
+
+					object.onBeforeRender( _this, scene, camera );
+
+					const element = object.element;
+
+					element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+
+					if ( element.parentNode !== domElement ) {
+
+						domElement.appendChild( element );
+
+					}
+
+					object.onAfterRender( _this, scene, camera );
+
+				}
+
+				const objectData = {
+					distanceToCameraSquared: getDistanceToSquared( camera, object )
+				};
+
+				cache.objects.set( object, objectData );
+
+			}
+
+			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
+
+				renderObject( object.children[ i ], scene, camera );
+
+			}
+
+		}
+
+		function getDistanceToSquared( object1, object2 ) {
+
+			_a.setFromMatrixPosition( object1.matrixWorld );
+			_b.setFromMatrixPosition( object2.matrixWorld );
+
+			return _a.distanceToSquared( _b );
+
+		}
+
+		function filterAndFlatten( scene ) {
+
+			const result = [];
+
+			scene.traverse( function ( object ) {
+
+				if ( object.isCSS2DObject ) result.push( object );
+
+			} );
+
+			return result;
+
+		}
+
+		function zOrder( scene ) {
+
+			const sorted = filterAndFlatten( scene ).sort( function ( a, b ) {
+
+				if ( a.renderOrder !== b.renderOrder ) {
+
+					return b.renderOrder - a.renderOrder;
+
+				}
+
+				const distanceA = cache.objects.get( a ).distanceToCameraSquared;
+				const distanceB = cache.objects.get( b ).distanceToCameraSquared;
+
+				return distanceA - distanceB;
+
+			} );
+
+			const zMax = sorted.length;
+
+			for ( let i = 0, l = sorted.length; i < l; i ++ ) {
+
+				sorted[ i ].element.style.zIndex = zMax - i;
+
+			}
+
+		}
+
+	}
+
+}
+
+//Importación de constructores
 
 const subsetOfTHREE = {
   MOUSE,
@@ -31890,6 +32091,7 @@ camara.position.x = 3;
 camara.position.y = 3;
 //camara.lookAt(axesHelper.position)
 
+/*
 // Raycasting
 
 const geoCubo = new BoxGeometry(1, 1, 1);
@@ -31916,23 +32118,23 @@ canvasHtml.addEventListener("mousemove", (event) => {
 
   const colisiona = inters.length !== 0;
   if (!colisiona) {
-    reinicioObjeto();
+    reinicioObjeto()
     return;
   }
 
-  const primerElemento = inters[0];
-  const enObjeto = seleccionPrevia.objeto === primerElemento.object;
+  const primerElemento = inters[0]
+  const enObjeto = seleccionPrevia.objeto === primerElemento.object
 
   if(enObjeto) return
   
-  reinicioObjeto();
+  reinicioObjeto()
 
-  seleccionPrevia.objeto = primerElemento.object;
-  seleccionPrevia.material = primerElemento.object.material;
+  seleccionPrevia.objeto = primerElemento.object
+  seleccionPrevia.material = primerElemento.object.material
 
-  primerElemento.object.material = resaltador;
+  primerElemento.object.material = resaltador
 
-});
+})
 
 function reinicioObjeto(){
   if (seleccionPrevia.objeto) {
@@ -31940,7 +32142,7 @@ function reinicioObjeto(){
     seleccionPrevia.objeto = null;
     seleccionPrevia.material = null;
   }
-}
+}*/
 
 /*
 //Geometría y materiales
@@ -32018,6 +32220,21 @@ renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight, false);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor("white", 1);
 
+//Etiquetador
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight);
+const canvas2D = labelRenderer.domElement;
+canvas2D.style.position = "absolute";
+canvas2D.style.pointerEvents = "none";
+canvas2D.style.top="0";
+document.body.appendChild(canvas2D);
+
+const label = document.createElement("h1");
+label.textContent = "Prueba";
+const labelObject = new CSS2DObject(label);
+escena.add(labelObject);
+
 //Animación de objetos
 
 function animate() {
@@ -32030,6 +32247,7 @@ function animate() {
   const delta = clock.getDelta();
   controls.update(delta);
   renderer.render(escena, camara);
+  labelRenderer.render(escena, camara);
   requestAnimationFrame(animate);
 }
 
@@ -32041,6 +32259,7 @@ camara.addEventListener("resize", () => {
   camara.aspect = canvasHtml.clientWidth / canvasHtml.clientHeight;
   camara.updateProjectionMatrix();
   renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight, false);
+  labelRenderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight);
 });
 
 /*
@@ -32095,6 +32314,7 @@ const wireframe = new LineSegments(edgesGeo,edgesMaterial)
 spaceStation.add(wireframe)
 
 */
+
 /*
 //Loaders
 

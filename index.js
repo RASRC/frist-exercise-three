@@ -34,6 +34,8 @@ import CameraControls from "camera-controls";
 
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
+import {CSS2DRenderer,CSS2DObject} from "three/examples/jsm/renderers/CSS2DRenderer.js"
+
 const subsetOfTHREE = {
   MOUSE,
   Vector2,
@@ -76,6 +78,7 @@ camara.position.x = 3;
 camara.position.y = 3;
 //camara.lookAt(axesHelper.position)
 
+/*
 // Raycasting
 
 const geoCubo = new BoxGeometry(1, 1, 1);
@@ -126,7 +129,7 @@ function reinicioObjeto(){
     seleccionPrevia.objeto = null;
     seleccionPrevia.material = null;
   }
-}
+}*/
 
 /*
 //Geometría y materiales
@@ -204,6 +207,21 @@ renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight, false);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor("white", 1);
 
+//Etiquetador
+
+const labelRenderer = new CSS2DRenderer()
+labelRenderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight)
+const canvas2D = labelRenderer.domElement
+canvas2D.style.position = "absolute"
+canvas2D.style.pointerEvents = "none"
+canvas2D.style.top="0"
+document.body.appendChild(canvas2D)
+
+const label = document.createElement("h1")
+label.textContent = "Prueba"
+const labelObject = new CSS2DObject(label)
+escena.add(labelObject)
+
 //Animación de objetos
 
 function animate() {
@@ -216,6 +234,7 @@ function animate() {
   const delta = clock.getDelta();
   controls.update(delta);
   renderer.render(escena, camara);
+  labelRenderer.render(escena, camara);
   requestAnimationFrame(animate);
 }
 
@@ -227,6 +246,7 @@ camara.addEventListener("resize", () => {
   camara.aspect = canvasHtml.clientWidth / canvasHtml.clientHeight;
   camara.updateProjectionMatrix();
   renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight, false);
+  labelRenderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight);
 });
 
 /*
@@ -281,6 +301,7 @@ const wireframe = new LineSegments(edgesGeo,edgesMaterial)
 spaceStation.add(wireframe)
 
 */
+
 /*
 //Loaders
 
