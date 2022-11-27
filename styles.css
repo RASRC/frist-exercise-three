@@ -12,6 +12,36 @@ p {
     padding: 1rem;
 }
 
+.label-container{
+  pointer-events: all;
+  display: flex;
+  justify-content: center;
+}
+
+button{
+  border: none;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.button-hidden{
+  display: none;
+}
+
+button:hover{
+  cursor: pointer;
+}
+
+.label{
+  background-color: rgba(255,255,255,0.6);
+  color: black;
+  padding: 8px;
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+
+}
+
 .hidden{
     visibility: collapse;
 }

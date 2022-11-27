@@ -34,7 +34,10 @@ import CameraControls from "camera-controls";
 
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-import {CSS2DRenderer,CSS2DObject} from "three/examples/jsm/renderers/CSS2DRenderer.js"
+import {
+  CSS2DRenderer,
+  CSS2DObject,
+} from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 const subsetOfTHREE = {
   MOUSE,
@@ -191,7 +194,7 @@ CameraControls.install({ THREE: subsetOfTHREE });
 const clock = new Clock();
 const controls = new CameraControls(camara, canvasHtml);
 controls.dollyToCursor = true;
-controls.setLookAt(3, 4, 2, 0, 0, 0);
+controls.setLookAt(20, 30, 20, 0, 0, 0);
 
 /*const controls = new OrbitControls(camara, canvasHtml);
 controls.enableDamping = true;*/
@@ -207,20 +210,95 @@ renderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight, false);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor("white", 1);
 
+//Loaders
+
+const loadingScreen = document.getElementById("pantalla-carga");
+const progreso = document.getElementById("barra-progreso");
+let Objeto3D;
+
+const loader = new GLTFLoader();
+loader.load(
+  "./police_station.glb",
+  (archivo) => {
+    Objeto3D = archivo.scene;
+    loadingScreen.classList.add("hidden");
+    escena.add(Objeto3D);
+  },
+  (progress) => {
+    const avanceBruto = (progress.loaded / progress.total) * 100;
+    const avanceRedondeo = Math.round(avanceBruto);
+    progreso.textContent = `CARGANDO ${avanceRedondeo}%`;
+    //console.log(progress)
+  },
+  (error) => {
+    console.log(error);
+  }
+);
+
 //Etiquetador
 
-const labelRenderer = new CSS2DRenderer()
-labelRenderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight)
-const canvas2D = labelRenderer.domElement
-canvas2D.style.position = "absolute"
-canvas2D.style.pointerEvents = "none"
-canvas2D.style.top="0"
-document.body.appendChild(canvas2D)
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(canvasHtml.clientWidth, canvasHtml.clientHeight);
+const canvas2D = labelRenderer.domElement;
+canvas2D.style.position = "absolute";
+canvas2D.style.pointerEvents = "none";
+canvas2D.style.top = "0";
+document.body.appendChild(canvas2D);
 
-const label = document.createElement("h1")
+/*const label = document.createElement("h1")
 label.textContent = "Prueba"
 const labelObject = new CSS2DObject(label)
-escena.add(labelObject)
+escena.add(labelObject)*/
+
+const raycaster = new Raycaster();
+const mouse = new Vector2();
+
+canvasHtml.addEventListener("dblclick", (event) => {
+  mouse.x = (event.clientX / canvasHtml.clientWidth) * 2 - 1;
+  mouse.y = -(event.clientY / canvasHtml.clientHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camara);
+  const inters = raycaster.intersectObject(Objeto3D);
+
+  const elementoInt = inters[0];
+  const position = elementoInt.point;
+
+  const message = window.prompt("Escribe una incidencia:");
+
+  if (!inters.length) {
+    return;
+  }
+
+  const contenedor = document.createElement("div");
+  contenedor.classList.add("label-container");
+
+  const cancelButton = document.createElement("button");
+  cancelButton.textContent = "X";
+  cancelButton.classList.add("button-hidden");
+  contenedor.appendChild(cancelButton);
+
+  const label = document.createElement("p");
+  label.textContent = message;
+  label.classList.add("label");
+  contenedor.appendChild(label);
+
+  const labelObject = new CSS2DObject(contenedor);
+  labelObject.position.copy(position);
+  escena.add(labelObject);
+
+  cancelButton.onclick = () => {
+    labelObject.removeFromParent(); //Quito objeto de la escena
+    labelObject.element = null; //Elimino objeto
+    contenedor.remove(); //Elimino contenedor
+  };
+
+  contenedor.onmouseenter = () => {
+    cancelButton.classList.remove("button-hidden");
+  };
+
+  contenedor.onmouseleave = () => {
+    cancelButton.classList.add("button-hidden");
+  };
+});
 
 //Animación de objetos
 
@@ -300,41 +378,4 @@ const edgesMaterial = new LineBasicMaterial({color: "black"})
 const wireframe = new LineSegments(edgesGeo,edgesMaterial)
 spaceStation.add(wireframe)
 
-*/
-
-/*
-//Loaders
-
-const loadingScreen = document.getElementById("pantalla-carga")
-const progreso = document.getElementById("barra-progreso")
-
-const loader = new GLTFLoader()
-loader.load("./police_station.glb",
-(archivo) =>{
-  loadingScreen.classList.add("hidden")
-  escena.add(archivo.scene)
-},
-(progress)=>{
-  const avanceBruto = progress.loaded / progress.total * 100
-  const avanceRedondeo = Math.round(avanceBruto)
-  progreso.textContent = `CARGANDO ${avanceRedondeo}%`
-  //console.log(progress)
-},
-(error)=>{
-  console.log(error)
-}
-)
-
-    <div id="pantalla-carga">
-      <div class="loader">
-        <div class="loader-square"></div>
-        <div class="loader-square"></div>
-        <div class="loader-square"></div>
-        <div class="loader-square"></div>
-        <div class="loader-square"></div>
-        <div class="loader-square"></div>
-        <div class="loader-square"></div>
-      </div>
-      <p id="barra-progreso"></p>
-    </div>
 */
