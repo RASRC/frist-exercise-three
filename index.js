@@ -62,6 +62,8 @@ import gsap from "gsap";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
+import Stats from "stats.js/src/Stats";
+
 //Canvas HTML
 
 const canvasHtml = document.getElementById("escena-inicial");
@@ -302,6 +304,10 @@ canvasHtml.addEventListener("dblclick", (event) => {
 
 //Animación de objetos
 
+const stats = new Stats()
+stats.showPanel(2)
+document.body.appendChild(stats.dom)
+
 function animate() {
   /*cubo.rotation.x += 0.01;
     cubo.rotation.z += 0.01;*/
@@ -309,10 +315,12 @@ function animate() {
     sol.rotation.y += 0.01
     tierra.rotation.y += 0.03
     */
+  stats.begin()
   const delta = clock.getDelta();
   controls.update(delta);
   renderer.render(escena, camara);
   labelRenderer.render(escena, camara);
+  stats.end()
   requestAnimationFrame(animate);
 }
 
